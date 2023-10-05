@@ -12,6 +12,6 @@ On a ***75 Hz*** refresh rate monitor:
 
 ## Usage
 
-You can download the Windows executable from the [releases](https://github.com/codynhanpham/human-benchmark) page.
+You can download the Windows executable from the [releases](https://github.com/codynhanpham/human-benchmark/releases) page.
 
 Launch the executable and follow the instructions.
