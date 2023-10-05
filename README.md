@@ -6,6 +6,7 @@ Destroy human benchmark games with this script. That's it.
 On a ***75 Hz*** refresh rate monitor:
 - Reaction Time: `< 15 ms`
 - Aim Trainer: `< 35 ms`
+- Sequence Memory: `∞`
 - Typing Test: `> 385 WPM`
 
 (Others are work in progress)

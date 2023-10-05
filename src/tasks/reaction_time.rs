@@ -6,7 +6,7 @@ use std::{thread, time};
 pub fn reaction_time() {
     println!("\n----------\n");
     let mut enigo = Enigo::new();
-    let click_dur = time::Duration::from_millis(100);
+    let click_dur = time::Duration::from_millis(20);
     let screen = Screen::from_point(0, 0).unwrap();
     
     println!("Focus the cursor on the reaction time window, then click to start the test.");

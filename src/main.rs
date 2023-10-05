@@ -9,8 +9,9 @@ fn main() {
     println!();
     println!("0. Mouse Position Tracker\n");
     println!("1. Reaction Time");
-    println!("2. Typing Test");
-    println!("3. Aim Trainer");
+    println!("2. Aim Trainer");
+    println!("3. Sequence Memory");
+    println!("4. Typing Test");
 
     println!();
 
@@ -19,8 +20,9 @@ fn main() {
     match program {
         0 => tasks::mouse_pos_tracker::mouse_pos_tracker(),
         1 => tasks::reaction_time::reaction_time(),
-        2 => tasks::typing_test::typing_test(),
-        3 => tasks::aim_trainer::aim_trainer(),
+        2 => tasks::aim_trainer::aim_trainer(),
+        3 => tasks::sequence_memory::sequence_memory(),
+        4 => tasks::typing_test::typing_test(),
         _ => {
             println!("Please enter a valid number.");
             main();
