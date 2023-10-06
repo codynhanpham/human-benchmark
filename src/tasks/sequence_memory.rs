@@ -124,8 +124,6 @@ pub fn sequence_memory() {
             last_all_blank = time::Instant::now();
         }
 
-
-
         // check if the color is not board color and not locked
         for (index, point) in nine_points_color.iter().enumerate() {
             if *point != board_color && !lock_states[index] {

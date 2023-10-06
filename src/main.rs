@@ -12,6 +12,8 @@ fn main() {
     println!("2. Aim Trainer");
     println!("3. Sequence Memory");
     println!("4. Typing Test");
+    println!("5. Verbal Memory");
+
 
     println!();
 
@@ -23,6 +25,7 @@ fn main() {
         2 => tasks::aim_trainer::aim_trainer(),
         3 => tasks::sequence_memory::sequence_memory(),
         4 => tasks::typing_test::typing_test(),
+        5 => tasks::verbal_memory::verbal_memory(),
         _ => {
             println!("Please enter a valid number.");
             main();
