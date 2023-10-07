@@ -1,14 +1,10 @@
-use image::ImageBuffer;
 use image::Rgba;
 use screenshots::Screen;
 use enigo::*;
-use crate::utils::*;
-use std::ffi::CStr;
-use std::ptr;
-use leptonica_sys::{pixCreate, pixSetPixel, pixDestroy};
-use tesseract_sys::*;
 use std::collections::HashSet;
 use std::{thread, time};
+
+use crate::utils::*;
 
 // click able button for this is [255, 209, 84, 255]
 // Left is Seen
@@ -23,7 +19,7 @@ pub fn verbal_memory() {
     let _ = get_input("Enter to start...");
 
     // detect the play area
-    let play_area = detect_app_region();
+    let play_area = detect_app_region(None);
     println!("Play area: From ({}, {}) to ({}, {})", play_area.x, play_area.y, play_area.x + play_area.width, play_area.y + play_area.height);
 
     let screen = Screen::from_point(0, 0).unwrap();
@@ -34,62 +30,18 @@ pub fn verbal_memory() {
     let board_color = Rgba([255 as u8, 209 as u8, 84 as u8, 255 as u8]);
     let background_color = Rgba([43 as u8, 135 as u8, 209 as u8, 255 as u8]);
 
-    let mut left_edges: Vec<(i32, i32)> = Vec::new();
-    let mut last_pixel = background_color;
-    
-    // check for the transition from the background color to the board color, save the x and y values --> left edges
-    for (i, pixel) in image.pixels().enumerate() {
-        if *pixel == board_color {
-            // check if the previous pixel was the background color
-            if i > 0 && last_pixel == background_color {
-                // save the x and y values
-                let x = (i % play_area.width as usize) as i32;
-                let y = (i / play_area.width as usize) as i32;
-                
-                left_edges.push((x, y));
-            }
-        }
-        last_pixel = *pixel;
-    }
+    let buttons = detect_track_points(board_color, background_color, &image, &play_area);
 
-    // the left edge contains the left edge of each square, each some pixels long. There are gaps (background color) between each square, though
-    let mut two_buttons: Vec<(i32, i32)> = Vec::new();
-
-    // convert the left edges to a vector of x values and vector of y values
-    let mut x_values: Vec<i32> = Vec::new();
-    let mut y_values: Vec<i32> = Vec::new();
-
-    for (x, y) in &left_edges {
-        x_values.push(*x);
-        y_values.push(*y);
-    }
-
-    // there should be a gap, so if x -  or y - 1 is in the vector, then it is not the first point of a square. remove it from the vector
-    for (_, (x, y)) in left_edges.iter().enumerate() {
-        if x_values.contains(&(x - 1)) || y_values.contains(&(y - 1)) {
-            // not the first point of a square
-            continue;
-        } else {
-            // first point of a square
-            two_buttons.push((x.clone() + 25, y.clone() + 20)); // add some padding so that the mouse is not on the edge of the square
-        }
-    }
-    
-    // find the index (position) of these points in the image vector
-    let mut nine_points_index: Vec<usize> = Vec::new();
-    
-    for (x, y) in &two_buttons {
-        let index = (y * play_area.width as i32 + x) as usize;
-        nine_points_index.push(index);
-    }
+    let two_buttons = buttons.track_points;
     
     println!("Game board coordinates detected.\n");
-    println!("Button coordinates: {:?}", two_buttons);
+    println!("Button coordinates: {:?}\n\n", two_buttons);
 
     let mut enigo = Enigo::new();
 
     let mut word_collection: HashSet<String> = HashSet::new();
     let mut last_score = -1;
+    let mut last_lives = -1;
     let mut state:bool; // true is on, false is off
     let mut last_collection_size = 0;
 
@@ -109,12 +61,23 @@ pub fn verbal_memory() {
             Ok(n) => n,
             Err(_) => break,
         };
+        let lives = match text.lines().nth(0).unwrap_or("error").split("|").nth(1).unwrap_or("error").split("Score").nth(0).unwrap_or("error").trim().parse::<i32>() {
+            Ok(n) => n,
+            Err(_) => break,
+        };
+
+        // println!("Word: {}", word);
+        // println!("Score: {}", score);
+        // println!("Lives: {}", lives);
         
-        if score != last_score {
+        // frame is updated either when score is updated or lives is updated
+        if score != last_score || lives != last_lives {
+            // update last_score and last_lives
+            last_score = score;
+            last_lives = lives;
+            // update state
             state = true;
-            last_score += 1;
-        }
-        else {
+        } else {
             state = false;
         }
 
@@ -134,11 +97,11 @@ pub fn verbal_memory() {
             enigo.mouse_click(MouseButton::Left);
         }
 
-        word_collection.insert(word);
+        word_collection.insert(word.clone());
         
         // if collection size update, print the new size
         if word_collection.len() != last_collection_size {
-            println!("Collection size: {}", word_collection.len());
+            println!("Collection size:\t{}\t║\tNew word:\t{}", word_collection.len(), word);
             last_collection_size = word_collection.len();
         }
 
@@ -152,41 +115,4 @@ pub fn verbal_memory() {
     println!("\n");
     let _ = get_input("Press enter to restart...");
     verbal_memory();
-}
-
-fn ocr(image: &ImageBuffer<Rgba<u8>, Vec<u8>>) -> String {
-    unsafe {
-        let cube = TessBaseAPICreate();
-        TessBaseAPIInit3(cube, ptr::null(), b"eng\0".as_ptr().cast());
-
-        let mut pix = pixCreate(image.width() as i32, image.height() as i32, 32);
-
-        for (x, y, pixel) in image.enumerate_pixels() {
-            let r = pixel[0] as u32;
-            let g = pixel[1] as u32;
-            let b = pixel[2] as u32;
-            let a = pixel[3] as u32;
-
-            let rgba = (r << 24) | (g << 16) | (b << 8) | a;
-
-            pixSetPixel(pix, x as i32, y as i32, rgba);
-        }
-
-        TessBaseAPISetImage2(cube, pix);
-
-        TessBaseAPIRecognize(cube, ptr::null_mut());
-
-        pixDestroy(&mut pix);
-
-        let text = TessBaseAPIGetUTF8Text(cube);
-
-        let c_str = CStr::from_ptr(text);
-        let string = c_str.to_str().unwrap();
-
-        // TessDeleteText(text);
-        TessBaseAPIEnd(cube);
-        TessBaseAPIDelete(cube);
-
-        string.to_string()
-    }
 }

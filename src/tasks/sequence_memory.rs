@@ -5,6 +5,7 @@ use image::Rgba;
 use screenshots::Screen;
 use enigo::*;
 use std::{thread, time};
+use std::io::{stdout,Write};
 
 use crate::utils::*;
 
@@ -13,8 +14,10 @@ pub fn sequence_memory() {
     println!("Start the game, MEMORIZE THE FIRST SEQUENCE, then start this script.\nDO NOT CLICK YET...");
     let _ = get_input("Enter to start...");
 
+    delay_countdown(2);
+
     // detect the play area
-    let play_area = detect_app_region();
+    let play_area = detect_app_region(None);
 
     // take a screenshot of the play area
     let screen = Screen::from_point(0, 0).unwrap();
@@ -27,68 +30,28 @@ pub fn sequence_memory() {
     let board_color = Rgba([37 as u8, 115 as u8, 193 as u8, 255 as u8]);
     let background_color = Rgba([43 as u8, 135 as u8, 209 as u8, 255 as u8]);
 
-    let mut left_edges: Vec<(i32, i32)> = Vec::new();
-    let mut last_pixel = background_color;
-    
-    // check for the transition from the background color to the board color, save the x and y values --> left edges
-    for (i, pixel) in image.pixels().enumerate() {
-        if *pixel == board_color {
-            // check if the previous pixel was the background color
-            if i > 0 && last_pixel == background_color {
-                // save the x and y values
-                let x = (i % play_area.width as usize) as i32;
-                let y = (i / play_area.width as usize) as i32;
-                
-                left_edges.push((x, y));
-            }
-        }
-        last_pixel = *pixel;
-    }
+    let board = detect_track_points(board_color, background_color, &image, &play_area);
 
-    // the left edge contains the left edge of each square, each some pixels long. There are gaps (background color) between each square, though
-    let mut nine_points: Vec<(i32, i32)> = Vec::new();
-
-    // convert the left edges to a vector of x values and vector of y values
-    let mut x_values: Vec<i32> = Vec::new();
-    let mut y_values: Vec<i32> = Vec::new();
-
-    for (x, y) in &left_edges {
-        x_values.push(*x);
-        y_values.push(*y);
-    }
-
-    // there should be a gap, so if x -  or y - 1 is in the vector, then it is not the first point of a square. remove it from the vector
-    for (_, (x, y)) in left_edges.iter().enumerate() {
-        if x_values.contains(&(x - 1)) || y_values.contains(&(y - 1)) {
-            // not the first point of a square
-            continue;
-        } else {
-            // first point of a square
-            nine_points.push((x.clone() + 25, y.clone() + 20)); // add some padding so that the mouse is not on the edge of the square
-        }
-    }
-    
-    // find the index (position) of these points in the image vector
-    let mut nine_points_index: Vec<usize> = Vec::new();
-    
-    for (x, y) in &nine_points {
-        let index = (y * play_area.width as i32 + x) as usize;
-        nine_points_index.push(index);
-    }
+    let nine_points_index = board.track_indexes;
+    let nine_points = board.track_points;
     
     println!("Game board coordinates detected.\n");
     
     // ------- 
     let mut sequence_stream: Vec<usize> = Vec::new(); // sequence of the index of the 9 points, in order changed
+    let mut sequence_stream_last_len: usize = 0;
     let mut last_sequence = sequence_stream.clone();
     let mut lock_states: Vec<bool> = Vec::new(); // whether the point is locked or not
     // lock state --> 9 bools, default is false for not locked
     lock_states.resize(9, false);
     let mut last_all_blank = time::Instant::now();
+    let mut reset_sequence = true;
     
     let mut enigo = Enigo::new();
 
-    println!("Click on the first sequence to start.");
+    println!("\x1b[33mNote: If this script fail during the first sequence, restart the script and try again.\x1b[0m");
+
+    println!("\nClick on the first sequence to start.");
     
     // game loop: check the color of the 9 points in each iteration screenshot, if the color is not board color and not locked, then add the index to the sequence
     // after changing the color, lock the point, and unlock after that color has changed back to board color
@@ -101,9 +64,7 @@ pub fn sequence_memory() {
         for index in &nine_points_index {
             nine_points_color.push(*image.get_pixel(*index as u32 % play_area.width, *index as u32 / play_area.width));
         }
-
-        // println!("Nine points color: {:?}", nine_points_color);
-
+        
         // if all 9 points are board color, then reset the sequence
         let mut all_blank = true;
         for point in &nine_points_color {
@@ -115,9 +76,10 @@ pub fn sequence_memory() {
 
         if all_blank {
             // if the last all blank was more than 1 seconds ago, reset the sequence
-            if last_all_blank.elapsed().as_millis() >= 900 {
+            if last_all_blank.elapsed().as_millis() >= 800 {
                 last_sequence = sequence_stream.clone();
                 sequence_stream.clear();
+                reset_sequence = true;
                 lock_states = vec![false; 9];
             }
         } else {
@@ -139,11 +101,11 @@ pub fn sequence_memory() {
                 lock_states[index] = false;
             }
         }
-
+        
         if sequence_stream == last_sequence || sequence_stream == [0, 1, 2, 3, 4, 5, 6, 7, 8] {
             sequence_stream.clear();
         }
-
+        
         // remove the [0, 1, 2, 3, 4, 5, 6, 7, 8] sequence anywhere in the sequence
         let mut index = 0;
         while index < sequence_stream.len() {
@@ -154,32 +116,42 @@ pub fn sequence_memory() {
             }
         }
 
-        // if sequence_stream and last_sequence are not empty, print out the values
-        if !sequence_stream.is_empty() || !last_sequence.is_empty() {
-            println!("Sequence Stream: {:?}", sequence_stream);
-            println!("Last Sequence: {:?}", last_sequence);
-        }
-
         // convert the sequence to a vec of the 9 points coordinates
         let mut sequence_points: Vec<(i32, i32)> = Vec::new();
-
+        
         for index in &last_sequence {
             sequence_points.push(nine_points[*index]);
         }
+        
+        // log:
+        if sequence_stream.len() == 1 && reset_sequence {
+            reset_sequence = false;
+            print!("Sequence: {:?}", sequence_stream[0]);
+            stdout().flush().expect("Failed to flush stdout");
+        }
+        else if sequence_stream.len() == sequence_stream_last_len + 1 {
+            print!(" {:?}", sequence_stream[sequence_stream.len() - 1]);
+            stdout().flush().expect("Failed to flush stdout");
+        }
 
+        if !last_sequence.is_empty() && last_sequence != sequence_stream {
+            println!("\nLast sequence: {:?}", last_sequence);
+        }
+        
         // in order, move the mouse to the points in the sequence and click
         for (x, y) in &sequence_points {
             enigo.mouse_move_to(play_area.x as i32 + x, play_area.y as i32 + y);
-
+            
             // debug sleep here to check mouse pos
             // thread::sleep(time::Duration::from_millis(1000));
-
+            
             enigo.mouse_down(MouseButton::Left);
             thread::sleep(time::Duration::from_millis(20));
             enigo.mouse_up(MouseButton::Left);
             thread::sleep(time::Duration::from_millis(50));
         }
-
+        
+        sequence_stream_last_len = sequence_stream.len();
         last_sequence.clear();
         thread::sleep(time::Duration::from_millis(100));
     }

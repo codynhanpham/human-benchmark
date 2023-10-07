@@ -33,7 +33,7 @@ pub fn aim_trainer() {
     let _ = get_input("Enter to start...");
 
     // detect the play area
-    let play_area = detect_app_region();
+    let play_area = detect_app_region(None);
 
     // if width or height is 0, then the app is not found, so restart the program
     if play_area.width == 0 || play_area.height == 0 {
@@ -78,9 +78,9 @@ pub fn aim_trainer() {
         // if the same xy, also skip, probably the frame did not refresh
         let error_margin = 5; // after abs
         if (x - last_xy.0).abs() <= error_margin && (y - last_xy.1).abs() <= error_margin {
-            // if the mouse has not moved for more than 1.5 second, break, otherwise, skip
-            if last_mouse_moved.elapsed().as_millis() >= 1500 {
-                println!("Mouse has not moved for more than 1.5 seconds, Emergency break!");
+            // if the mouse has not moved for more than some seconds, break, otherwise, skip
+            if last_mouse_moved.elapsed().as_millis() >= 2500 {
+                println!("Mouse has not moved for more than 2.5 seconds, Emergency break!");
                 break;
             } else {
                 continue;

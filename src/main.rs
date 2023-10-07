@@ -4,6 +4,9 @@ mod utils;
 use utils::*;
 
 fn main() {
+    println!("PLEASE try not to change the humanbenchmark window size or position during the run.");
+    println!("\n----------\n");
+    
     // ask for which program to run
     println!("Which program would you like to run?");
     println!();
@@ -17,7 +20,7 @@ fn main() {
 
     println!();
 
-    let program = get_input_int("Enter the number of the program: ");
+    let program = get_input_int("Enter the number of the program: ", None);
 
     match program {
         0 => tasks::mouse_pos_tracker::mouse_pos_tracker(),

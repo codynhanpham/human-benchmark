@@ -18,4 +18,6 @@ You can download the Windows executable from the [releases](https://github.com/c
 
 Also, download the English trained data [eng.traineddata](https://github.com/tesseract-ocr/tessdata/blob/main/eng.traineddata) file and place it in the same directory as the executable. This is required for optical character recognition (OCR) tasks.
 
+Since OCR is not perfect, tests requiring OCR may requires a few tries to get a good result.
+
 Launch the executable and follow the instructions.
