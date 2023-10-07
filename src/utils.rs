@@ -137,6 +137,11 @@ pub fn detect_app_region(mut color: Option<Rgba<u8>>) -> Region {
             x = (i as u32 % screen.display_info.width) as u32;
             y = (i as u32 / screen.display_info.width) as u32;
             x -= 10;
+
+            if x > screen.display_info.width {
+                // this is impossible
+                x = 0;
+            }
             break;
         }
     }
