@@ -14,6 +14,8 @@ On a ***75 Hz*** refresh rate monitor:
 
 ## Usage
 
+This script only works with Windows machines.
+
 You can download the Windows executable from the [releases](https://github.com/codynhanpham/human-benchmark/releases) page.
 
 Also, download the English trained data [eng.traineddata](https://github.com/tesseract-ocr/tessdata/blob/main/eng.traineddata) file and place it in the same directory as the executable. This is required for optical character recognition (OCR) tasks.
@@ -37,33 +39,33 @@ Here is the result:
 ```js
 let count = 0;
 function aimClick() {
-	if (count > 31) return;
+    if (count > 31) return;
 
-	count +=1;
-	const aimTrue = document.querySelector('div[data-aim-target="true"]');
-	const targetDiv = aimTrue?.getElementsByTagName('div')[3] || null;
-	if (targetDiv == null) return;
+    count +=1;
+    const aimTrue = document.querySelector('div[data-aim-target="true"]');
+    const targetDiv = aimTrue?.getElementsByTagName('div')[3] || null;
+    if (targetDiv == null) return;
 
-	const box = targetDiv.getBoundingClientRect(),
-		coordX = box.left + (box.right - box.left) / 2,
-		coordY = box.top + (box.bottom - box.top) / 2;
-	simulateMouseEvent (targetDiv, "mousedown", coordX, coordY);
-	simulateMouseEvent (targetDiv, "mouseup", coordX, coordY);
-	simulateMouseEvent (targetDiv, "click", coordX, coordY);
+    const box = targetDiv.getBoundingClientRect(),
+        coordX = box.left + (box.right - box.left) / 2,
+        coordY = box.top + (box.bottom - box.top) / 2;
+    simulateMouseEvent(targetDiv, "mousedown", coordX, coordY);
+    simulateMouseEvent(targetDiv, "mouseup", coordX, coordY);
+    simulateMouseEvent(targetDiv, "click", coordX, coordY);
 
-	window.requestAnimationFrame(aimClick);
+    window.requestAnimationFrame(aimClick);
 }
 
 window.requestAnimationFrame(aimClick);
 
 const simulateMouseEvent = function(element, eventName, coordX, coordY) {
-	element.dispatchEvent(new MouseEvent(eventName, {
-		view: window,
-		bubbles: true,
-		cancelable: true,
-		clientX: coordX,
-		clientY: coordY,
-		button: 0
-	}));
+    element.dispatchEvent(new MouseEvent(eventName, {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        clientX: coordX,
+        clientY: coordY,
+        button: 0
+    }));
 };
 ```

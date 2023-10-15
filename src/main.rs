@@ -26,6 +26,7 @@ fn main() {
         0 => tasks::mouse_pos_tracker::mouse_pos_tracker(),
 
         1 => tasks::reaction_time::reaction_time(),
+        10 => tasks::js_inject::reaction_time_inject(),
 
         2 => tasks::aim_trainer::aim_trainer(),
         20 => tasks::js_inject::aim_trainer_inject(),
