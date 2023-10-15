@@ -10,21 +10,25 @@ use screenshots::Screen;
 // off focus color is rgba(213, 231, 246, 255) --> use this color to detect the typing region
 pub fn typing_test() {
     println!("\n----------\n");
-    
-    // 2 way to do this, ask for user choice
-    // either doing ocr and type automatically,
-    // or ask the user to copy the text and paste it into a file
+    loop {
+        // 2 way to do this, ask for user choice
+        // either doing ocr and type automatically,
+        // or ask the user to copy the text and paste it into a file
 
-    // ask for user choice
-    println!("Do you want to use OCR to detect the text automatically, or do you want to do that manually?");
-    println!("1. OCR");
-    println!("2. Manual");
-    let choice = get_input_int("Enter the number of your choice: ", Some(1));
+        // ask for user choice
+        println!("Do you want to use OCR to detect the text automatically, or do you want to do that manually?");
+        println!("1. OCR");
+        println!("2. Manual");
+        let choice = get_input_int("Enter the number of your choice: ", Some(1));
 
-    if choice == 1 {
-        typing_test_ocr();
-    } else {
-        typing_test_manual();
+        if choice == 1 {
+            typing_test_ocr();
+        } else {
+            typing_test_manual();
+        }
+
+        println!("\n");
+        let _ = get_input("Press enter to restart...");
     }
 }
 
@@ -57,6 +61,8 @@ fn typing_test_ocr() {
     // type the text
     // enigo.key_sequence(&text); // a bit too slow
     simulate::type_str(&text).unwrap();
+
+    println!("Done!");
 }
 
 fn typing_test_manual() {

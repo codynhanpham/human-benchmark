@@ -20,9 +20,9 @@ pub fn aim_trainer_inject() {
         const box = targetDiv.getBoundingClientRect(),
             coordX = box.left + (box.right - box.left) / 2,
             coordY = box.top + (box.bottom - box.top) / 2;
-        simulateMouseEvent (targetDiv, "mousedown", coordX, coordY);
-        simulateMouseEvent (targetDiv, "mouseup", coordX, coordY);
-        simulateMouseEvent (targetDiv, "click", coordX, coordY);
+        simulateMouseEvent(targetDiv, "mousedown", coordX, coordY);
+        simulateMouseEvent(targetDiv, "mouseup", coordX, coordY);
+        simulateMouseEvent(targetDiv, "click", coordX, coordY);
 
         window.requestAnimationFrame(aimClick);
     }
