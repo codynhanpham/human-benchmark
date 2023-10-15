@@ -4,3 +4,4 @@ pub mod mouse_pos_tracker;
 pub mod aim_trainer;
 pub mod sequence_memory;
 pub mod verbal_memory;
+pub mod js_inject;

@@ -55,8 +55,8 @@ fn typing_test_ocr() {
     enigo.mouse_click(MouseButton::Left);
 
     // type the text
-    enigo.key_sequence(&text);
-    println!("Done!");
+    // enigo.key_sequence(&text); // a bit too slow
+    simulate::type_str(&text).unwrap();
 }
 
 fn typing_test_manual() {
@@ -88,13 +88,11 @@ fn typing_test_manual() {
     fs::remove_file("html.txt").expect("Unable to delete file");
     println!("Temporary file deleted.\n\n----------\n\n");
 
-
-    let mut enigo = Enigo::new();
-
     // set a delay countdown of 5 seconds, then start typing the sequence
     println!("Focus the cursor on the typing test window.");
     delay_countdown(8);
     println!("Running typing test...");
-    enigo.key_sequence(&text_string);
+    simulate::type_str(&text_string).unwrap();
+    
     println!("Done!");
 }

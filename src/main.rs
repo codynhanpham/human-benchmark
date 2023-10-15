@@ -24,11 +24,19 @@ fn main() {
 
     match program {
         0 => tasks::mouse_pos_tracker::mouse_pos_tracker(),
+
         1 => tasks::reaction_time::reaction_time(),
+
         2 => tasks::aim_trainer::aim_trainer(),
+        20 => tasks::js_inject::aim_trainer_inject(),
+
         3 => tasks::sequence_memory::sequence_memory(),
+
         4 => tasks::typing_test::typing_test(),
+
         5 => tasks::verbal_memory::verbal_memory(),
+
+        
         _ => {
             println!("Please enter a valid number.");
             main();
