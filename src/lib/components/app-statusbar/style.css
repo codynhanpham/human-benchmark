@@ -1,0 +1,15 @@
+@import '$src/app.css';
+
+@layer components {
+    .statusbar-override {
+        button {
+            @apply !cursor-pointer !py-0 !px-1.5 !border-none !bg-transparent !h-full !rounded-none;
+            &:hover, &:active, &:focus-visible {
+                @apply !bg-accent/80;
+            }
+        }
+        span {
+            margin-bottom: 1px;
+        }
+    }
+}
