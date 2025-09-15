@@ -1,5 +1,9 @@
 use tauri::{Manager, RunEvent, WindowEvent};
 
+mod ocr;
+
+
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Init the Builder and configure plugins
@@ -18,7 +22,9 @@ pub fn run() {
     }
 
     // Registering Rust functions
-    builder = builder.invoke_handler(tauri::generate_handler![exit_app]);
+    builder = builder.invoke_handler(tauri::generate_handler![
+        exit_app,
+    ]);
 
     let app = builder
         .setup(|app| {

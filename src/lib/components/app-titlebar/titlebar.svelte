@@ -5,6 +5,8 @@
 
 	import { Button } from '$lib/components/ui/button/index.js';
 
+	import { AppNavigator } from '$lib/components/app-navigator/index.js';
+
 	import {
 		Copy,
 		Minus as IconMinus,
@@ -45,7 +47,7 @@
 >
 	<div data-tauri-drag-region class="flex h-fit w-full items-center justify-between gap-8">
 		<div data-tauri-drag-region class="h-fit w-full max-w-fit">
-			
+			<AppNavigator class="ml-0.5" />
 		</div>
 
 		<div data-tauri-drag-region class="flex h-fit min-w-max items-center gap-0.5">
