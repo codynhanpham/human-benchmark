@@ -1,7 +1,7 @@
 use tauri::{Manager, RunEvent, WindowEvent};
 
 mod ocr;
-
+mod screen;
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -24,6 +24,8 @@ pub fn run() {
     // Registering Rust functions
     builder = builder.invoke_handler(tauri::generate_handler![
         exit_app,
+        screen::utils::get_mouse_position,
+        screen::utils::detect_play_arena,
     ]);
 
     let app = builder

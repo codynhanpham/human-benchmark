@@ -1931,6 +1931,7 @@ dependencies = [
  "enigo",
  "image",
  "ocrs",
+ "rayon",
  "rten",
  "rten-imageproc",
  "rten-tensor",
