@@ -1,7 +1,8 @@
 use tauri::{Manager, RunEvent, WindowEvent};
 
-mod ocr;
+mod game;
 mod screen;
+mod ocr;
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -25,7 +26,10 @@ pub fn run() {
     builder = builder.invoke_handler(tauri::generate_handler![
         exit_app,
         screen::utils::get_mouse_position,
-        screen::utils::detect_play_arena,
+        screen::utils::tauri_detect_play_arena,
+        game::reaction_time::start_reaction_time,
+        game::aim_training::start_aim_training,
+        game::typing::start_typing_test,
     ]);
 
     let app = builder

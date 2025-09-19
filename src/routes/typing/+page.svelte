@@ -1,16 +1,17 @@
 <script lang="ts">
     import { invoke } from "@tauri-apps/api/core";
-    import { openUrl } from "@tauri-apps/plugin-opener";
 
     import { Button } from "$lib/components/ui/button/index.js";
 
-    import { History } from "@lucide/svelte/icons";
+    import { LoaderCircle } from "@lucide/svelte/icons";
 
     import { page } from "$app/state";
     import { onMount } from "svelte";
 
     let mousePosition = $state({ x: 0, y: 0 });
     let mouseInterval: number;
+
+    let isRunning = $state(false);
 
     onMount(() => {
         mouseInterval = setInterval(() => {
@@ -29,24 +30,25 @@
         variant="outline"
         class="w-full"
         onclick={async () => {
-            const arena = await invoke("tauri_detect_play_arena");
-            console.log("Detected Play Arena:", arena);
+            isRunning = true;
+            await invoke("start_typing_test").catch((e) => {
+                isRunning = false;
+                console.error("Error starting typing test:", e);
+            });
+            isRunning = false;
         }}
+        disabled={isRunning}
     >
-        Detect Play Arena
-    </Button>
-
-
-    <Button
-        id="start-ocr"
-        variant="outline"
-        class="w-full"
-        onclick={async () => {
-            const fps = await invoke("test_screenshot_region_speed");
-            console.log("FPS:", fps);
-        }}
-    >
-        Test Screenshot Speed
+        {#if isRunning}
+            <LoaderCircle class="animate-spin mr-1" />
+            <span>
+                [Please don't move the cursor!]
+            </span>
+        {:else}
+            <span>
+                Start Typing Test
+            </span>
+        {/if}
     </Button>
 
     <p class="text-center">({mousePosition.x}, {mousePosition.y})</p>
