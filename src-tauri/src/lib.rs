@@ -30,6 +30,7 @@ pub fn run() {
         game::reaction_time::start_reaction_time,
         game::aim_training::start_aim_training,
         game::typing::start_typing_test,
+        game::number_memory::start_number_memory,
     ]);
 
     let app = builder

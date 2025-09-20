@@ -171,7 +171,7 @@ pub fn find_target_colored_pixels(image: &image::RgbaImage, target_colors: &Vec<
 }
 
 /// Calculate an optimal downscale factor based on image dimensions
-fn calculate_optimal_downscale_factor(width: u32, height: u32) -> u32 {
+pub fn calculate_optimal_downscale_factor(width: u32, height: u32) -> u32 {
     let smaller_dimension = width.min(height);
     
     // If already small enough, don't downscale
@@ -187,7 +187,7 @@ fn calculate_optimal_downscale_factor(width: u32, height: u32) -> u32 {
 }
 
 /// Downscale the image by the given factor using nearest neighbor sampling
-fn downscale_image(image: &image::RgbaImage, factor: u32) -> image::RgbaImage {
+pub fn downscale_image(image: &image::RgbaImage, factor: u32) -> image::RgbaImage {
     if factor == 1 {
         return image.clone();
     }

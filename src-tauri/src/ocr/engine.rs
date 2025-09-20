@@ -29,7 +29,7 @@ pub fn init_ocr_engine() -> Result<OcrEngine, Box<dyn Error>> {
 }
 
 
-pub fn predict_from_image_buffer(engine: &OcrEngine, ocr_input: &OcrInput) -> Result<Vec<String>, Box<dyn Error>> {
+pub fn predict_from_image_buffer(engine: &OcrEngine, ocr_input: &OcrInput, filter_len: usize) -> Result<Vec<String>, Box<dyn Error>> {
     // Detect and recognize text. If you only need the text and don't need any
     // layout information, you can also use `engine.get_text(&ocr_input)`,
     // which returns all the text in an image as a single string.
@@ -49,7 +49,7 @@ pub fn predict_from_image_buffer(engine: &OcrEngine, ocr_input: &OcrInput) -> Re
         .flatten()
         // Filter likely spurious detections. With future model improvements
         // this should become unnecessary.
-        .filter(|l| l.to_string().len() > 1)
+        .filter(|l| l.to_string().len() > filter_len)
         .map(|l| l.to_string())
         .collect();
 
