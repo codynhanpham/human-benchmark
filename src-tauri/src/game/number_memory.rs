@@ -75,6 +75,7 @@ pub async fn start_number_memory() -> Result<(), String> {
         if input_field.is_none() && primary_button.is_none() {
             // On the number display screen
             if number_detected {
+                std::thread::sleep(Duration::from_millis(500));
                 continue;
             }
             else {
@@ -125,7 +126,7 @@ pub async fn start_number_memory() -> Result<(), String> {
             // Add 1000 ms timeout for next level
             timeout += 1000;
 
-            std::thread::sleep(Duration::from_millis(300)); // wait a bit for the next number to appear
+            std::thread::sleep(Duration::from_millis(500)); // wait a bit for the next number to appear
         } else if primary_button.is_some() {
             // On the game end screen
             break;

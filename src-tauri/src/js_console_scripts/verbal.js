@@ -1,3 +1,5 @@
+(() => {
+
 function simulateMouseEvent(element, eventName, coordX, coordY) {
     element.dispatchEvent(new MouseEvent(eventName, {
         view: window,
@@ -71,3 +73,5 @@ function verbalMem() {
 }
 
 requestAnimationFrame(verbalMem);
+
+})();
